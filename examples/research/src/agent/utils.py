@@ -51,3 +51,30 @@ def fetch_doc(url: str) -> str:
         return markdownify(response.text)
     except (httpx.HTTPStatusError, httpx.RequestError) as e:
         return f"Encountered an HTTP error: {str(e)}"
+
+def search_web(query: str) -> str:
+    """Perform a web search using DuckDuckGo Instant Answer API and return the top results.
+
+    Args:
+        query (str): The search query.
+
+    Returns:
+        str: A summary of the top results.
+    """
+    try:
+        params = {"q": query, "format": "json", "no_redirect": 1, "no_html": 1, "skip_disambig": 1}
+        response = httpx_client.get("https://api.duckduckgo.com/", params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        results = []
+        if "AbstractText" in data and data["AbstractText"]:
+            results.append(f"Abstract: {data['AbstractText']}")
+        if "RelatedTopics" in data and data["RelatedTopics"]:
+            for topic in data["RelatedTopics"][:3]:
+                if isinstance(topic, dict) and "Text" in topic:
+                    results.append(f"- {topic['Text']}")
+        if not results:
+            return "No relevant results found."
+        return "\n".join(results)
+    except Exception as e:
+        return f"Web search failed: {str(e)}"

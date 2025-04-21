@@ -1,18 +1,10 @@
-import os
-
-try:
-    import dotenv
-    dotenv.load_dotenv()
-except ImportError:
-    pass
-
 from langchain.chat_models import init_chat_model
 from langgraph.prebuilt import create_react_agent
 from langgraph_swarm import create_handoff_tool, create_swarm
 
 # from swarm_researcher.configuration import Configuration
 from swarm_researcher.prompts import planner_prompt, researcher_prompt
-from swarm_researcher.utils import fetch_doc, search_web
+from swarm_researcher.utils import fetch_doc
 
 # LLM
 model = init_chat_model(model="gpt-4o", model_provider="openai")
@@ -44,7 +36,7 @@ planner_agent = create_react_agent(
 researcher_agent = create_react_agent(
     model,
     prompt=researcher_prompt,
-    tools=[fetch_doc, search_web, transfer_to_planner_agent],
+    tools=[fetch_doc, transfer_to_planner_agent],
     name="researcher_agent",
 )
 

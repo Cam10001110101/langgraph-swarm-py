@@ -1,6 +1,13 @@
+import os
 import datetime
 from collections import defaultdict
 from typing import Callable
+
+try:
+    import dotenv
+    dotenv.load_dotenv()
+except ImportError:
+    pass
 
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
